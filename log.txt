@@ -1,0 +1,235 @@
+PS C:\Users\zahee\Downloads\project> python .\A_config.py
+============================================================
+  PROJECT CONFIGURATION  (config.yaml)
+============================================================
+data:
+  max_samples_per_dataset: 700
+  corpus_limit: 1500
+retrieval:
+  shard_delay_sec: 0.004
+  top_k: 5
+  cache_dir: .retriever_cache
+  tfidf_word:
+    analyzer: word
+    ngram_range: [1, 2]
+  tfidf_char:
+    analyzer: char_wb
+    ngram_range: [3, 5]
+  bm25:
+    k1: 1.5
+    b: 0.75
+benchmark:
+  query_set_sizes: [100, 250, 500]
+  worker_counts: [1, 2, 4]
+  main_max_samples: 500
+  use_batch_parallel: False
+llm:
+  hf_model: google/flan-t5-base
+  max_tokens: 200
+  temperature: 0.0
+============================================================
+Config loaded from: C:\Users\zahee\Downloads\project\config.yaml
+All modules read parameters from this file via get_config().
+PS C:\Users\zahee\Downloads\project> python .\B_extract_datasets.py
+  medquad.csv already present — 47441 rows, skipping download.
+  medqa_usmle.csv already present — 10178 rows, skipping download.
+PubMedQA rows: 1000
+MedQuAD rows: 47441
+MedQA rows: 10178
+PubMedQA labels: {'yes': 552, 'no': 338, 'maybe': 110}
+MedQuAD top sources: {'ADAM': 17348, 'MPlusDrugs': 12889, 'GHR': 5430, 'GARD': 5394, 'NIDDK': 1192, 'NINDS': 1088, 'MPlusHealthTopics': 981, 'MPlusHerbsSupplements': 792, 'NIHSeniorHealth': 769, 'CancerGov': 729}
+MedQA answer option labels: {'A': 2584, 'B': 2654, 'C': 2557, 'D': 2383}
+
+PS C:\Users\zahee\Downloads\project> python .\C_data_loader.py
+MedQuAD rows: 47441
+PubMedQA rows: 1000
+MedQA rows: 10178
+Data loading successful
+PS C:\Users\zahee\Downloads\project> python .\D_preprocess.py
+============================================================
+  D_preprocess -- Corpus & Query Builder
+============================================================
+  Data source     : local_csv
+  Corpus rows     : 2,100
+  Saved to        : C:\Users\zahee\Downloads\project\data\processed_corpus.csv
+  Columns         : doc_id, source, question, answer, text, label, dataset
+
+  Dataset breakdown:
+    MedQA          700 docs
+    MedQuAD        700 docs
+    PubMedQA       700 docs
+
+  Label distribution (across all datasets):
+    faq          700  (33.3%)
+    exam         700  (33.3%)
+    yes          397  (18.9%)
+    no           228  (10.9%)
+    maybe         75  (3.6%)
+============================================================
+PS C:\Users\zahee\Downloads\project> python .\E_retriever.py
+Sample query: What are the symptoms of diabetes?
+Top results:
+1. PubMedQA-doc-314 score=0.1972 text=Since insulin therapy might have an atherogenic effect, we studied the relationship between cumulative insulin dose and atherosclerosis in type 1 diabetes. We have focused on patie
+2. MedQuAD-doc-1164 score=0.1712 text=These resources address the diagnosis or management of Wolfram syndrome:  - Gene Review: Gene Review: WFS1-Related Disorders  - Genetic Testing Registry: Diabetes mellitus AND insi
+3. PubMedQA-doc-101 score=0.1441 text=To explore whether electrochemiluminescence (ECL) assays can help improve prediction of time to type 1 diabetes in the TrialNet autoantibody-positive population. TrialNet subjects 
+4. MedQuAD-doc-1160 score=0.1261 text=Wolfram syndrome is a condition that affects many of the body's systems. The hallmark features of Wolfram syndrome are high blood sugar levels resulting from a shortage of the horm
+5. PubMedQA-doc-570 score=0.1225 text=Individuals with type 1 diabetes have a high risk of developing cardiovascular diseases, and it has been reported that they consume a high atherogenic diet. We examined how nutrien
+PS C:\Users\zahee\Downloads\project> python .\F_llm_generator.py
+======================================================================
+  F_llm_generator -- Local LLM Demo
+  Model : google/flan-t5-base  (no API key required)
+======================================================================
+
+----------------------------------------------------------------------
+  Demo 1/3
+  Q: Does aspirin reduce recurrent cardiovascular events?
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+config.json: 1.40kB [00:00, 5.53MB/s]
+C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages\huggingface_hub\file_download.py:138: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\zahee\.cache\huggingface\hub\models--google--flan-t5-base. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+tokenizer_config.json: 2.54kB [00:00, 15.1MB/s]
+spiece.model: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 792k/792k [00:01<00:00, 435kB/s]
+tokenizer.json: 2.42MB [00:00, 13.8MB/s]
+special_tokens_map.json: 2.20kB [00:00, 12.2MB/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+model.safetensors: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 990M/990M [01:57<00:00, 8.45MB/s]
+Loading weights: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 8034.68it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+generation_config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 147/147 [00:00<00:00, 1.49MB/s]
+[llm_generator] Model ready.
+  Prediction  : YES
+  Answer      : yes
+  Citations   : PubMedQA-22301, PubMedQA-18742
+
+----------------------------------------------------------------------
+  Demo 2/3
+  Q: Is vitamin D supplementation associated with fewer asthma attacks?
+  Prediction  : NO
+  Answer      : no
+  Citations   : PubMedQA-31045, PubMedQA-29876
+
+----------------------------------------------------------------------
+  Demo 3/3
+  Q: What is the first-line treatment for anaphylaxis?
+  Prediction  : YES
+  Answer      : yes
+  Citations   : MedQuAD-Anaphylaxis-01, MedQuAD-Anaphylaxis-02
+
+======================================================================
+  LLM generator working correctly -- ready for benchmark pipeline.
+======================================================================
+PS C:\Users\zahee\Downloads\project> python .\G_serial_rag.py   
+=================================================================
+  G_serial_rag -- Serial RAG Baseline
+  Corpus size : 1,500 documents
+  Queries     : 100
+  Retrievers  : TF-IDF (word), TF-IDF (char_wb), BM25-lite
+=================================================================
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 11898.26it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[llm_generator] Model ready.
+  Processed  100/100 queries ...
+
+-----------------------------------------------------------------
+  RESULTS SUMMARY
+-----------------------------------------------------------------
+  Total queries processed : 100
+  Average latency         : 0.4605 sec/query
+  Min / Max latency       : 0.3528 / 5.9630 sec
+  Accuracy (PubMedQA)     : 31.0%  (100 answerable queries)
+  Citation coverage       : 100.0%
+  Prediction distribution : no: 67  |  yes: 33
+
+  Sample Predictions (first 5):
+  #    Dataset    Prediction   Truth    Question
+  ---- ---------- ------------ -------- ----------------------------------------
+  [X]  PubMedQA   no           yes      Do mitochondria play a role in remodelling la...
+  [X]  PubMedQA   yes          no       Landolt C and snellen e acuity: differences i...
+  [X]  PubMedQA   no           yes      Syncope during bathing in infants, a pediatri...
+  [OK] PubMedQA   no           no       Are the long-term results of the transanal pu...
+  [OK] PubMedQA   yes          yes      Can tailored interventions increase mammograp...
+-----------------------------------------------------------------
+
+  Saved -> C:\Users\zahee\Downloads\project\report_results\serial_results.csv
+  Columns: query_id, dataset, question, predicted_answer, ground_truth, correct, latency_sec, n_citations, citation, answer_text, top_evidence
+PS C:\Users\zahee\Downloads\project> python .\H_parallel_rag.py
+=================================================================
+  H_parallel_rag -- Parallel RAG Pipeline
+  Corpus size  : 1,500 documents
+  Queries      : 100
+  Worker counts: [1, 2, 4]
+  Retrievers   : TF-IDF (word), TF-IDF (char_wb), BM25-lite
+=================================================================
+
+  Running with 1 worker(s) ...
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 13090.08it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[llm_generator] Model ready.
+    ✓ Done -- avg latency: 0.4536 sec | accuracy: 32.0% | critic pass: 98.0%
+
+  Running with 2 worker(s) ...
+    ✓ Done -- avg latency: 0.5405 sec | accuracy: 32.0% | critic pass: 98.0%
+
+  Running with 4 worker(s) ...
+    ✓ Done -- avg latency: 1.2407 sec | accuracy: 32.0% | critic pass: 98.0%
+
+-----------------------------------------------------------------
+  PARALLEL RAG -- WORKER COMPARISON
+-----------------------------------------------------------------
+  Workers       Avg Latency    Speedup   Efficiency   Accuracy  Critic OK
+  --------     ------------   --------   ----------   --------  ---------
+  1                 0.4536s      1.000        1.000      32.0%      98.0%
+  2                 0.5405s      0.839        0.420      32.0%      98.0%
+  4                 1.2407s      0.366        0.091      32.0%      98.0%
+-----------------------------------------------------------------
+
+  Total rows saved : 300
+  Saved -> C:\Users\zahee\Downloads\project\report_results\parallel_results.csv
+  Columns: query_id, dataset, question, predicted_answer, ground_truth, correct, latency_sec, workers, critic_passed, n_citations, citation, answer_text, top_evidence\
+PS C:\Users\zahee\Downloads\project> python .\I_evaluate.py    
+========================================================================
+  I_evaluate -- Benchmark Results Summary
+========================================================================
+  Serial baseline  : 0.4605 sec/query  (100 queries)
+  Parallel datasets: 3 worker configurations evaluated
+
+------------------------------------------------------------------------
+  Workers  Avg Par.(s)   Speedup  Efficiency   Accuracy  Citation%   HitRate
+  -------   ----------   -------   ---------   --------   --------   -------
+        1       0.4536     1.015       1.015     32.0%     100.0%    100.0%
+        2       0.5405     0.852       0.426     32.0%     100.0%    100.0%
+        4       1.2407     0.371       0.093     32.0%     100.0%    100.0%
+------------------------------------------------------------------------
+
+  Best speedup    : 1.015x with 1 worker(s)
+  Accuracy note   : Only PubMedQA queries (yes/no/maybe) count toward accuracy.
+  MedQuAD / MedQA queries are labelled 'faq'/'exam' and excluded from accuracy.
+
+  Sample Predictions (5 shown):
+    Gold    Pred  Question
+  ------  ------  --------------------------------------------------
+     yes    yes[OK]  Do mitochondria play a role in remodelling lace plant l...
+      no  maybe[X]  Landolt C and snellen e acuity: differences in strabism...
+     yes    yes[OK]  Syncope during bathing in infants, a pediatric form of ...
+      no     no[OK]  Are the long-term results of the transanal pull-through...
+     yes     no[X]  Can tailored interventions increase mammography use amo...
+
+------------------------------------------------------------------------
+  Artifacts saved to: C:\Users\zahee\Downloads\project\report_results
+    ✓ latency_results.csv
+    ✓ citation_results.csv
+    ✓ speedup_chart.png
+    ✓ efficiency_chart.png
+========================================================================
+PS C:\Users\zahee\Downloads\project> python .\J_write_materials.py
+Updated: C:\Users\zahee\Downloads\project\report_results\final_report.md
+Updated: C:\Users\zahee\Downloads\project\report_results\presentation_slides.md
+PS C:\Users\zahee\Downloads\project> python .\K_convert_deliverables.py
+Created: C:\Users\zahee\Downloads\project\report_results\final_report.docx
+Created: C:\Users\zahee\Downloads\project\report_results\final_report.pdf
+Created: C:\Users\zahee\Downloads\project\report_results\presentation_slides.pptx

@@ -1,0 +1,372 @@
+PS C:\Users\zahee\Downloads\project> python .\A_config.py
+============================================================
+  PROJECT CONFIGURATION  (config.yaml)
+============================================================
+data:
+  max_samples_per_dataset: 700
+  corpus_limit: 1500
+retrieval:
+  shard_delay_sec: 0.004
+  top_k: 5
+  cache_dir: .retriever_cache
+  tfidf_word:
+    analyzer: word
+    ngram_range: [1, 2]
+  tfidf_char:
+    analyzer: char_wb
+    ngram_range: [3, 5]
+  bm25:
+    k1: 1.5
+    b: 0.75
+benchmark:
+  query_set_sizes: [100, 250, 500]
+  worker_counts: [1, 2, 4]
+  main_max_samples: 500
+  use_batch_parallel: False
+llm:
+  hf_model: google/flan-t5-base
+  max_tokens: 200
+  temperature: 0.0
+============================================================
+Config loaded from: C:\Users\zahee\Downloads\project\config.yaml
+All modules read parameters from this file via get_config().
+PS C:\Users\zahee\Downloads\project> python .\B_extract_datasets.py
+  medquad.csv already present — 47441 rows, skipping download.
+  medqa_usmle.csv already present — 10178 rows, skipping download.
+PubMedQA rows: 1000
+MedQuAD rows: 47441
+MedQA rows: 10178
+PubMedQA labels: {'yes': 552, 'no': 338, 'maybe': 110}
+MedQuAD top sources: {'ADAM': 17348, 'MPlusDrugs': 12889, 'GHR': 5430, 'GARD': 5394, 'NIDDK': 1192, 'NINDS': 1088, 'MPlusHealthTopics': 981, 'MPlusHerbsSupplements': 792, 'NIHSeniorHealth': 769, 'CancerGov': 729}
+MedQA answer option labels: {'A': 2584, 'B': 2654, 'C': 2557, 'D': 2383}
+
+PS C:\Users\zahee\Downloads\project> python .\C_data_loader.py
+MedQuAD rows: 47441
+PubMedQA rows: 1000
+MedQA rows: 10178
+Data loading successful
+PS C:\Users\zahee\Downloads\project> python .\E_retriever.py
+── TF-IDF ──────────────────────────────────────────────────
+1. [PubMedQA-doc-314] score=0.1972  Since insulin therapy might have an atherogenic effect, we studied the relationship between cumulative insulin dose and 
+2. [MedQuAD-doc-1164] score=0.1712  These resources address the diagnosis or management of Wolfram syndrome:  - Gene Review: Gene Review: WFS1-Related Disor
+3. [PubMedQA-doc-101] score=0.1441  To explore whether electrochemiluminescence (ECL) assays can help improve prediction of time to type 1 diabetes in the T
+4. [MedQuAD-doc-1160] score=0.1261  Wolfram syndrome is a condition that affects many of the body's systems. The hallmark features of Wolfram syndrome are h
+5. [PubMedQA-doc-570] score=0.1225  Individuals with type 1 diabetes have a high risk of developing cardiovascular diseases, and it has been reported that t
+
+── BM25-Lite ───────────────────────────────────────────────
+1. [PubMedQA-doc-444] score=9.7786  The objectives of this study were to investigate longitudinal predictors of fear of recurrence in survivors of head and 
+2. [MedQA-doc-1460] score=8.9307  A new screening test utilizing a telemedicine approach to diagnosing diabetic retinopathy has been implemented in a diab
+3. [PubMedQA-doc-583] score=7.7992  The International Association of the Diabetes and Pregnancy Study Groups (IADPSG) recently recommended new criteria for 
+4. [MedQuAD-doc-812] score=7.6566  Caudal regression syndrome is a complex condition that may have different causes in different people. The condition is l
+5. [MedQuAD-doc-1369] score=7.6466  These resources address the diagnosis or management of CMAMMA:  - Genetic Testing Registry: Combined malonic and methylm
+
+── Dense (GPU) ─────────────────────────────────────────────
+Traceback (most recent call last):
+  File "C:\Users\zahee\Downloads\project\E_retriever.py", line 492, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\zahee\Downloads\project\E_retriever.py", line 486, in main
+    dense = DenseRetriever(corpus)
+  File "C:\Users\zahee\Downloads\project\E_retriever.py", line 318, in __init__
+    from sentence_transformers import SentenceTransformer  # lazy import
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'sentence_transformers'
+PS C:\Users\zahee\Downloads\project> pip install sentence_transformers
+Collecting sentence_transformers
+  Downloading sentence_transformers-5.4.1-py3-none-any.whl.metadata (17 kB)
+Requirement already satisfied: transformers<6.0.0,>=4.41.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (5.7.0)
+Requirement already satisfied: huggingface-hub>=0.23.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (1.13.0)
+Requirement already satisfied: torch>=1.11.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (2.11.0)
+Requirement already satisfied: numpy>=1.20.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (2.4.4)
+Requirement already satisfied: scikit-learn>=0.22.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (1.8.0)
+Requirement already satisfied: scipy>=1.0.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (1.17.1)
+Requirement already satisfied: typing_extensions>=4.5.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (4.15.0)
+Requirement already satisfied: tqdm>=4.0.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sentence_transformers) (4.67.3)
+Requirement already satisfied: packaging>=20.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (26.2)
+Requirement already satisfied: pyyaml>=5.1 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (6.0.3)
+Requirement already satisfied: regex>=2025.10.22 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (2026.4.4)
+Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (0.22.2)
+Requirement already satisfied: typer in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (0.25.1)
+Requirement already satisfied: safetensors>=0.4.3 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from transformers<6.0.0,>=4.41.0->sentence_transformers) (0.7.0)
+Requirement already satisfied: filelock>=3.10.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from huggingface-hub>=0.23.0->sentence_transformers) (3.29.0)
+Requirement already satisfied: fsspec>=2023.5.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from huggingface-hub>=0.23.0->sentence_transformers) (2026.2.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.4.3 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from huggingface-hub>=0.23.0->sentence_transformers) (1.4.3)
+Requirement already satisfied: httpx<1,>=0.23.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from huggingface-hub>=0.23.0->sentence_transformers) (0.28.1)
+Requirement already satisfied: anyio in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from httpx<1,>=0.23.0->huggingface-hub>=0.23.0->sentence_transformers) (4.13.0)
+Requirement already satisfied: certifi in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from httpx<1,>=0.23.0->huggingface-hub>=0.23.0->sentence_transformers) (2026.4.22)
+Requirement already satisfied: httpcore==1.* in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from httpx<1,>=0.23.0->huggingface-hub>=0.23.0->sentence_transformers) (1.0.9)
+Requirement already satisfied: idna in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from httpx<1,>=0.23.0->huggingface-hub>=0.23.0->sentence_transformers) (3.13)
+Requirement already satisfied: h11>=0.16 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from httpcore==1.*->httpx<1,>=0.23.0->huggingface-hub>=0.23.0->sentence_transformers) (0.16.0)
+Requirement already satisfied: joblib>=1.3.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from scikit-learn>=0.22.0->sentence_transformers) (1.5.3)
+Requirement already satisfied: threadpoolctl>=3.2.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from scikit-learn>=0.22.0->sentence_transformers) (3.6.0)
+Requirement already satisfied: setuptools<82 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from torch>=1.11.0->sentence_transformers) (81.0.0)
+Requirement already satisfied: sympy>=1.13.3 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from torch>=1.11.0->sentence_transformers) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from torch>=1.11.0->sentence_transformers) (3.6.1)
+Requirement already satisfied: jinja2 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from torch>=1.11.0->sentence_transformers) (3.1.6)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from sympy>=1.13.3->torch>=1.11.0->sentence_transformers) (1.3.0)
+Requirement already satisfied: colorama in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from tqdm>=4.0.0->sentence_transformers) (0.4.6)
+Requirement already satisfied: MarkupSafe>=2.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from jinja2->torch>=1.11.0->sentence_transformers) (3.0.3)
+Requirement already satisfied: click>=8.2.1 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (8.3.3)
+Requirement already satisfied: shellingham>=1.3.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (1.5.4)
+Requirement already satisfied: rich>=13.8.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (15.0.0)
+Requirement already satisfied: annotated-doc>=0.0.2 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (0.0.4)
+Requirement already satisfied: markdown-it-py>=2.2.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from rich>=13.8.0->typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (4.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from rich>=13.8.0->typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (2.20.0)
+Requirement already satisfied: mdurl~=0.1 in C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers<6.0.0,>=4.41.0->sentence_transformers) (0.1.2)
+Downloading sentence_transformers-5.4.1-py3-none-any.whl (571 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 571.3/571.3 kB 1.6 MB/s  0:00:00
+Installing collected packages: sentence_transformers
+Successfully installed sentence_transformers-5.4.1
+PS C:\Users\zahee\Downloads\project> python .\E_retriever.py          
+── TF-IDF ──────────────────────────────────────────────────
+1. [PubMedQA-doc-314] score=0.1972  Since insulin therapy might have an atherogenic effect, we studied the relationship between cumulative insulin dose and 
+2. [MedQuAD-doc-1164] score=0.1712  These resources address the diagnosis or management of Wolfram syndrome:  - Gene Review: Gene Review: WFS1-Related Disor
+3. [PubMedQA-doc-101] score=0.1441  To explore whether electrochemiluminescence (ECL) assays can help improve prediction of time to type 1 diabetes in the T
+4. [MedQuAD-doc-1160] score=0.1261  Wolfram syndrome is a condition that affects many of the body's systems. The hallmark features of Wolfram syndrome are h
+5. [PubMedQA-doc-570] score=0.1225  Individuals with type 1 diabetes have a high risk of developing cardiovascular diseases, and it has been reported that t
+
+── BM25-Lite ───────────────────────────────────────────────
+1. [PubMedQA-doc-444] score=9.7786  The objectives of this study were to investigate longitudinal predictors of fear of recurrence in survivors of head and 
+2. [MedQA-doc-1460] score=8.9307  A new screening test utilizing a telemedicine approach to diagnosing diabetic retinopathy has been implemented in a diab
+3. [PubMedQA-doc-583] score=7.7992  The International Association of the Diabetes and Pregnancy Study Groups (IADPSG) recently recommended new criteria for 
+4. [MedQuAD-doc-812] score=7.6566  Caudal regression syndrome is a complex condition that may have different causes in different people. The condition is l
+5. [MedQuAD-doc-1369] score=7.6466  These resources address the diagnosis or management of CMAMMA:  - Genetic Testing Registry: Combined malonic and methylm
+
+── Dense (GPU) ─────────────────────────────────────────────
+modules.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 349/349 [00:00<00:00, 779kB/s]
+C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages\huggingface_hub\file_download.py:138: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\zahee\.cache\huggingface\hub\models--sentence-transformers--all-MiniLM-L6-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+config_sentence_transformers.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████| 116/116 [00:00<00:00, 848kB/s]
+README.md: 10.5kB [00:00, 38.5MB/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+sentence_bert_config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████| 53.0/53.0 [00:00<00:00, 534kB/s]
+config.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 612/612 [00:00<00:00, 4.51MB/s]
+model.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 90.9M/90.9M [00:11<00:00, 8.25MB/s]
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 103/103 [00:00<00:00, 44740.40it/s]
+tokenizer_config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 350/350 [00:00<00:00, 2.57MB/s]
+vocab.txt: 232kB [00:00, 3.99MB/s]
+tokenizer.json: 466kB [00:00, 10.3MB/s]
+special_tokens_map.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 112/112 [00:00<00:00, 943kB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 190/190 [00:00<00:00, 1.52MB/s]
+[DenseRetriever] Encoding 1500 docs with sentence-transformers/all-MiniLM-L6-v2 on CPU …
+Batches: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:17<00:00,  1.36it/s]
+[DenseRetriever] Embeddings cached to C:\Users\zahee\Downloads\project\.retriever_cache\dense_sentence_transformers_all_MiniLM_L6_v2_e0038d6f.joblib
+[DenseRetriever] CUDA not available — using CPU FAISS index.
+1. [PubMedQA-doc-628] score=0.4739  Type 2 diabetes may be present for several years before diagnosis, by which time many patients have already developed di
+2. [MedQuAD-doc-1160] score=0.4494  Wolfram syndrome is a condition that affects many of the body's systems. The hallmark features of Wolfram syndrome are h
+3. [PubMedQA-doc-101] score=0.4095  To explore whether electrochemiluminescence (ECL) assays can help improve prediction of time to type 1 diabetes in the T
+4. [MedQA-doc-1417] score=0.3988  A 68-year-old man comes to the physician because of recurrent episodes of nausea and abdominal discomfort for the past 4
+5. [MedQuAD-doc-1335] score=0.3980  Congenital hyperinsulinism is a condition that causes individuals to have abnormally high levels of insulin, which is a 
+PS C:\Users\zahee\Downloads\project> python .\F_llm_generator.py
+======================================================================
+  F_llm_generator -- Local LLM Demo
+  Model : google/flan-t5-base  (no API key required)
+======================================================================
+
+----------------------------------------------------------------------
+  Demo 1/3
+  Q: Does aspirin reduce recurrent cardiovascular events?
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 11400.53it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[llm_generator] Model ready.
+  Prediction  : YES
+  Answer      : yes
+  Citations   : PubMedQA-22301, PubMedQA-18742
+
+----------------------------------------------------------------------
+  Demo 2/3
+  Q: Is vitamin D supplementation associated with fewer asthma attacks?
+  Prediction  : NO
+  Answer      : no
+  Citations   : PubMedQA-31045, PubMedQA-29876
+
+----------------------------------------------------------------------
+  Demo 3/3
+  Q: What is the first-line treatment for anaphylaxis?
+  Prediction  : YES
+  Answer      : yes
+  Citations   : MedQuAD-Anaphylaxis-01, MedQuAD-Anaphylaxis-02
+
+======================================================================
+  LLM generator working correctly -- ready for benchmark pipeline.
+======================================================================
+PS C:\Users\zahee\Downloads\project> python .\G_serial_rag.py
+=================================================================
+  G_serial_rag -- Serial RAG Baseline
+  Corpus size : 1,500 documents
+  Queries     : 100
+  Retrievers  : TF-IDF (word), TF-IDF (char_wb), BM25-lite
+=================================================================
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 11935.24it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[llm_generator] Model ready.
+  Processed  100/100 queries ...
+
+-----------------------------------------------------------------
+  RESULTS SUMMARY
+-----------------------------------------------------------------
+  Total queries processed : 100
+  Average latency         : 0.4778 sec/query
+  Min / Max latency       : 0.3613 / 4.8664 sec
+  Accuracy (PubMedQA)     : 31.0%  (100 answerable queries)
+  Citation coverage       : 100.0%
+  Prediction distribution : no: 67  |  yes: 33
+
+  Sample Predictions (first 5):
+  #    Dataset    Prediction   Truth    Question
+  ---- ---------- ------------ -------- ----------------------------------------
+  [X]  PubMedQA   no           yes      Do mitochondria play a role in remodelling la...
+  [X]  PubMedQA   yes          no       Landolt C and snellen e acuity: differences i...
+  [X]  PubMedQA   no           yes      Syncope during bathing in infants, a pediatri...
+  [OK] PubMedQA   no           no       Are the long-term results of the transanal pu...
+  [OK] PubMedQA   yes          yes      Can tailored interventions increase mammograp...
+-----------------------------------------------------------------
+
+  Saved -> C:\Users\zahee\Downloads\project\report_results\serial_results.csv
+  Columns: query_id, dataset, question, predicted_answer, ground_truth, correct, latency_sec, n_citations, citation, answer_text, top_evidence
+PS C:\Users\zahee\Downloads\project> python h
+C:\Users\zahee\AppData\Local\Programs\Python\Python313\python.exe: can't open file 'C:\\Users\\zahee\\Downloads\\project\\h': [Errno 2] No such file or directory
+PS C:\Users\zahee\Downloads\project> python .\H_parallel_rag.py
+=================================================================
+  H_parallel_rag -- Parallel RAG Pipeline
+  Corpus size  : 1,500 documents
+  Queries      : 100
+  Worker counts: [1, 2, 4]
+  Retrievers   : TF-IDF (word), TF-IDF (char_wb), BM25-lite
+=================================================================
+
+  Running with 1 worker(s) ...
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 12914.57it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[llm_generator] Model ready.
+    ✓ Done -- avg latency: 0.4793 sec | accuracy: 32.0% | critic pass: 98.0%
+
+  Running with 2 worker(s) ...
+    ✓ Done -- avg latency: 0.5559 sec | accuracy: 32.0% | critic pass: 98.0%
+
+  Running with 4 worker(s) ...
+    ✓ Done -- avg latency: 1.1106 sec | accuracy: 32.0% | critic pass: 98.0%
+
+-----------------------------------------------------------------
+  PARALLEL RAG -- WORKER COMPARISON
+-----------------------------------------------------------------
+  Workers       Avg Latency    Speedup   Efficiency   Accuracy  Critic OK
+  --------     ------------   --------   ----------   --------  ---------
+  1                 0.4793s      1.000        1.000      32.0%      98.0%
+  2                 0.5559s      0.862        0.431      32.0%      98.0%
+  4                 1.1106s      0.432        0.108      32.0%      98.0%
+-----------------------------------------------------------------
+
+  Total rows saved : 300
+  Saved -> C:\Users\zahee\Downloads\project\report_results\parallel_results.csv
+  Columns: query_id, dataset, question, predicted_answer, ground_truth, correct, latency_sec, workers, critic_passed, n_citations, citation, answer_text, top_evidence
+PS C:\Users\zahee\Downloads\project> python .\I_evaluate.py
+========================================================================
+  I_evaluate -- Benchmark Results Summary
+========================================================================
+  Serial baseline  : 0.4778 sec/query  (100 queries)
+  Parallel datasets: 3 worker configurations evaluated
+
+------------------------------------------------------------------------
+  Workers  Avg Par.(s)   Speedup  Efficiency   Accuracy  Citation%   HitRate
+  -------   ----------   -------   ---------   --------   --------   -------
+        1       0.4793     0.997       0.997     32.0%     100.0%    100.0%
+        2       0.5559     0.859       0.430     32.0%     100.0%    100.0%
+        4       1.1106     0.430       0.108     32.0%     100.0%    100.0%
+------------------------------------------------------------------------
+
+  Best speedup    : 0.997x with 1 worker(s)
+  Accuracy note   : Only PubMedQA queries (yes/no/maybe) count toward accuracy.
+  MedQuAD / MedQA queries are labelled 'faq'/'exam' and excluded from accuracy.
+
+  Sample Predictions (5 shown):
+    Gold    Pred  Question
+  ------  ------  --------------------------------------------------
+     yes    yes[OK]  Do mitochondria play a role in remodelling lace plant l...
+      no  maybe[X]  Landolt C and snellen e acuity: differences in strabism...
+     yes    yes[OK]  Syncope during bathing in infants, a pediatric form of ...
+      no     no[OK]  Are the long-term results of the transanal pull-through...
+     yes     no[X]  Can tailored interventions increase mammography use amo...
+
+------------------------------------------------------------------------
+  Artifacts saved to: C:\Users\zahee\Downloads\project\report_results
+    ✓ latency_results.csv
+    ✓ citation_results.csv
+    ✓ speedup_chart.png
+    ✓ efficiency_chart.png
+========================================================================
+PS C:\Users\zahee\Downloads\project> python .\J_write_materials.py
+Updated: C:\Users\zahee\Downloads\project\report_results\final_report.md
+Updated: C:\Users\zahee\Downloads\project\report_results\presentation_slides.md
+PS C:\Users\zahee\Downloads\project> python .\K_convert_deliverables.py
+Created: C:\Users\zahee\Downloads\project\report_results\final_report.docx
+Created: C:\Users\zahee\Downloads\project\report_results\final_report.pdf
+Created: C:\Users\zahee\Downloads\project\report_results\presentation_slides.pptx
+PS C:\Users\zahee\Downloads\project> python .\L_main.py
+[INFO] Running on: CPU
+Traceback (most recent call last):
+  File "C:\Users\zahee\Downloads\project\L_main.py", line 88, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\zahee\Downloads\project\L_main.py", line 49, in main
+    dense_retriever_mpnet = DenseRetriever(
+        corpus,
+    ...<3 lines>...
+        shard_delay_sec=shard_delay_sec,
+    )
+TypeError: DenseRetriever.__init__() got an unexpected keyword argument 'index_factory'
+PS C:\Users\zahee\Downloads\project> python .\L_main.py                
+[INFO] Running on: CPU
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+modules.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 349/349 [00:00<00:00, 3.06MB/s]
+C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages\huggingface_hub\file_download.py:138: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\zahee\.cache\huggingface\hub\models--sentence-transformers--all-mpnet-base-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+config_sentence_transformers.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 116/116 [00:00<00:00, 1.06MB/s]
+README.md: 11.6kB [00:00, 23.0MB/s]
+sentence_bert_config.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 53.0/53.0 [00:00<00:00, 424kB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 571/571 [00:00<00:00, 4.65MB/s]
+model.safetensors: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 438M/438M [00:49<00:00, 8.86MB/s]
+Loading weights: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 199/199 [00:00<00:00, 9702.83it/s]
+tokenizer_config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 363/363 [00:00<00:00, 2.88MB/s]
+vocab.txt: 232kB [00:00, 4.03MB/s]
+tokenizer.json: 466kB [00:00, 10.2MB/s]
+special_tokens_map.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 239/239 [00:00<00:00, 2.62MB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 190/190 [00:00<00:00, 2.08MB/s]
+[DenseRetriever] Encoding 1500 docs with sentence-transformers/all-mpnet-base-v2 on CPU …
+Batches: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [02:47<00:00,  6.96s/it]
+[DenseRetriever] Embeddings cached to C:\Users\zahee\Downloads\project\.retriever_cache\dense_sentence_transformers_all_mpnet_base_v2_44c1e5ff.joblib
+[DenseRetriever] CUDA not available — using CPU FAISS index.
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 103/103 [00:00<00:00, 14293.72it/s]
+[DenseRetriever] Encoding 1500 docs with sentence-transformers/all-MiniLM-L6-v2 on CPU …
+Batches: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:17<00:00,  1.36it/s]
+[DenseRetriever] Embeddings cached to C:\Users\zahee\Downloads\project\.retriever_cache\dense_sentence_transformers_all_MiniLM_L6_v2_44c1e5ff.joblib
+[DenseRetriever] CUDA not available — using CPU FAISS index.
+modules.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 387/387 [00:00<00:00, 2.70MB/s]
+C:\Users\zahee\AppData\Local\Programs\Python\Python313\Lib\site-packages\huggingface_hub\file_download.py:138: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\zahee\.cache\huggingface\hub\models--intfloat--e5-small-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+README.md: 67.8kB [00:00, 132MB/s]
+sentence_bert_config.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 57.0/57.0 [00:00<00:00, 443kB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 615/615 [00:00<00:00, 4.28MB/s]
+model.safetensors: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 133M/133M [00:10<00:00, 12.6MB/s]
+Loading weights: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 199/199 [00:00<00:00, 9687.74it/s]
+tokenizer_config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 314/314 [00:00<00:00, 2.14MB/s]
+vocab.txt: 232kB [00:00, 3.62MB/s]
+tokenizer.json: 711kB [00:00, 14.4MB/s]
+special_tokens_map.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 125/125 [00:00<00:00, 935kB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 200/200 [00:00<00:00, 1.98MB/s]
+[DenseRetriever] Encoding 1500 docs with intfloat/e5-small-v2 on CPU …
+Batches: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:59<00:00,  2.46s/it]
+[DenseRetriever] Embeddings cached to C:\Users\zahee\Downloads\project\.retriever_cache\dense_intfloat_e5_small_v2_44c1e5ff.joblib
+[DenseRetriever] CUDA not available — using CPU FAISS index.
+[llm_generator] Loading 'google/flan-t5-base' ... (first call only, cached after)
+Loading weights: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 282/282 [00:00<00:00, 9439.09it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[llm_generator] Model ready.

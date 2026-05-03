@@ -1,0 +1,35 @@
+# Central configuration for the Distributed Agentic GraphRAG benchmark.
+# All tunable parameters live here; source files read them via config.py.
+
+data:
+  max_samples_per_dataset: 700
+  corpus_limit: 1500
+
+retrieval:
+  shard_delay_sec: 0.004
+  top_k: 5
+  cache_dir: ".retriever_cache"
+  tfidf_word:
+    analyzer: "word"
+    ngram_range: [1, 2]
+  tfidf_char:
+    analyzer: "char_wb"
+    ngram_range: [3, 5]
+  bm25:
+    k1: 1.5
+    b: 0.75
+
+benchmark:
+  query_set_sizes: [100, 250, 500]
+  worker_counts: [1, 2, 4]
+  main_max_samples: 500
+  use_batch_parallel: false
+
+llm:
+  # Local open-source LLM — no API key required.
+  # Model is downloaded once by HuggingFace and cached on disk automatically.
+  # flan-t5-large (~800 MB, Apache-2.0) gives ~60-65% PubMedQA accuracy.
+  # flan-t5-base  (~250 MB)            gives ~50% -- use if RAM is limited.
+  hf_model: "google/flan-t5-large"
+  max_tokens: 200
+  temperature: 0.0

@@ -1,18 +1,67 @@
+# ── Python bytecode ────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*.pyo
+
+# ── Virtual environments ────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+
+# ── Secrets / API keys ──────────────────────────────────────────────────────
+*.key
+secrets.yaml
+secrets.json
+
+# ── Test / coverage artefacts ───────────────────────────────────────────────
 .pytest_cache/
-.pytest_cache_local/
-.tmp/
-tests/_scratch*/
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
+
+# ── Retriever index cache ───────────────────────────────────────────────────
 .retriever_cache/
+
+# ── Build / package artefacts ───────────────────────────────────────────────
 *.egg-info/
 build/
 dist/
-project_final_submission.zip
-*.log
+*.whl
+*.tar.gz
+
+# ── Large generated data files (reproduced by running the pipeline) ─────────
+data/medquad.csv
+data/medqa_usmle.csv
+data/pubmedqa_labeled.csv
+data/processed_corpus.csv
+data/dataset_summary.txt
+
+# ── Generated report deliverables (reproduced by running the pipeline) ──────
+report_results/*.docx
+report_results/*.pdf
+report_results/*.pptx
 report_results/*.zip
 report_results/*_run_log.txt
 report_results/pipeline_run_log.txt
 report_results/project_run_log.txt
+
+# ── Archives ────────────────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.gz
+
+# ── Jupyter / IPython ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── OS / editor artefacts ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
